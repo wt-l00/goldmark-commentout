@@ -34,6 +34,7 @@ type commentoutParser struct {
 
 var defaultCommentoutParser = &commentoutParser{}
 
+// NewCommentoutParser returns a new CommentoutParser
 func NewCommentoutParser() parser.InlineParser {
 	return defaultCommentoutParser
 }
@@ -59,10 +60,12 @@ func (s *commentoutParser) CloseBlock(parent gast.Node, pc parser.Context) {
 	// nothing to do
 }
 
+// CommentoutHTMLRenderer is a renderer.NodeRenderer implementation that renders comementout
 type CommentoutHTMLRenderer struct {
 	html.Config
 }
 
+// NewCommentoutHTMLRenderer returns a new CommentoutHTMLRenderer
 func NewCommentoutHTMLRenderer(opts ...html.Option) renderer.NodeRenderer {
 	r := &CommentoutHTMLRenderer{
 		Config: html.NewConfig(),
@@ -73,6 +76,7 @@ func NewCommentoutHTMLRenderer(opts ...html.Option) renderer.NodeRenderer {
 	return r
 }
 
+// RegisterFuncs implements renderer.NodeRenderer.RegisterFuncs.
 func (r *CommentoutHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(ast.KindCommentout, r.renderCommentout)
 }
@@ -93,6 +97,7 @@ type commentoutASTTransformer struct {
 
 var defaultCommentoutASTTransformer = &commentoutASTTransformer{}
 
+// NewCommentoutASTTransformer returns a new CommentoutASTTransformar
 func NewCommentoutASTTransformer() parser.ASTTransformer {
 	return defaultCommentoutASTTransformer
 }
@@ -126,6 +131,7 @@ func (a *commentoutASTTransformer) Transform(node *gast.Document, reader text.Re
 type commentout struct {
 }
 
+// Commentout is an extension that allow you to use commentout expression like '<!-- something -->'
 var Commentout = &commentout{}
 
 func (e *commentout) Extend(m goldmark.Markdown) {
