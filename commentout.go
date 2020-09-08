@@ -95,9 +95,9 @@ var Commentout = &commentout{}
 
 func (e *commentout) Extend(m goldmark.Markdown) {
 	m.Parser().AddOptions(parser.WithInlineParsers(
-		util.Prioritized(NewCommentoutParser(), 1100),
+		util.Prioritized(NewCommentoutParser(), 500),
 	))
 	m.Renderer().AddOptions(renderer.WithNodeRenderers(
-		util.Prioritized(NewCommentoutHTMLRenderer(), 1100),
+		util.Prioritized(NewCommentoutHTMLRenderer(), 500),
 	))
 }
