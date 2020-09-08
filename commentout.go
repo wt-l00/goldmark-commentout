@@ -88,15 +88,44 @@ func (r *CommentoutHTMLRenderer) renderCommentout(w util.BufWriter, source []byt
 	return gast.WalkContinue, nil
 }
 
+type commentoutASTTransformer struct {
+}
+
+var defaultCommentoutASTTransformer = &commentoutASTTransformer{}
+
+func NewCommentoutASTTransformer() parser.ASTTransformer {
+	return defaultCommentoutASTTransformer
+}
+
+func (a *commentoutASTTransformer) Transform(node *gast.Document, reader text.Reader, pc parser.Context) {
+	gast.Walk(node, func(node gast.Node, entering bool) (gast.WalkStatus, error) {
+		if commentoutNode, ok := node.(*ast.Commentout); ok && entering && gast.IsParagraph(node.Parent()) {
+			paragrahphNode := commentoutNode.Parent()
+
+			paragrahphNode.Parent().AppendChild(paragrahphNode.Parent(), commentoutNode)
+
+			if paragrahphNode.ChildCount() == 0 {
+				paragrahphNode.Parent().RemoveChild(paragrahphNode.Parent(), paragrahphNode)
+			}
+		}
+		return gast.WalkContinue, nil
+	})
+}
+
 type commentout struct {
 }
 
 var Commentout = &commentout{}
 
 func (e *commentout) Extend(m goldmark.Markdown) {
-	m.Parser().AddOptions(parser.WithInlineParsers(
-		util.Prioritized(NewCommentoutParser(), 500),
-	))
+	m.Parser().AddOptions(
+		parser.WithInlineParsers(
+			util.Prioritized(NewCommentoutParser(), 500),
+		),
+		parser.WithASTTransformers(
+			util.Prioritized(NewCommentoutASTTransformer(), 500),
+		),
+	)
 	m.Renderer().AddOptions(renderer.WithNodeRenderers(
 		util.Prioritized(NewCommentoutHTMLRenderer(), 500),
 	))
