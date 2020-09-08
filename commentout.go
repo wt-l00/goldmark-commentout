@@ -100,12 +100,23 @@ func NewCommentoutASTTransformer() parser.ASTTransformer {
 func (a *commentoutASTTransformer) Transform(node *gast.Document, reader text.Reader, pc parser.Context) {
 	gast.Walk(node, func(node gast.Node, entering bool) (gast.WalkStatus, error) {
 		if commentoutNode, ok := node.(*ast.Commentout); ok && entering && gast.IsParagraph(node.Parent()) {
-			paragrahphNode := commentoutNode.Parent()
+			paragraphNode := commentoutNode.Parent()
 
-			paragrahphNode.Parent().AppendChild(paragrahphNode.Parent(), commentoutNode)
+			// commentoutは4種類
+			// 1. comment only（p tag消去）
+			// 2. str と comment（<p>str</p> comment）
+			// 3. comment と str（comment <p>str</p>）
+			// 4. str1 と comment と str2（<p>str1str2</p> comment ）
+			// AppendChildはtailにappendするため，3の場合が困る．このため，以下のif文が必要
+			if paragraphNode.FirstChild().Kind() == ast.KindCommentout {
+				paragraphNode.Parent().InsertBefore(paragraphNode.Parent(), paragraphNode, paragraphNode.FirstChild())
+			} else {
+				paragraphNode.Parent().AppendChild(paragraphNode.Parent(), commentoutNode)
+			}
 
-			if paragrahphNode.ChildCount() == 0 {
-				paragrahphNode.Parent().RemoveChild(paragrahphNode.Parent(), paragrahphNode)
+			// paragraph node以下にノードがないなら，paragraph nodeは必要ない
+			if paragraphNode.ChildCount() == 0 {
+				paragraphNode.Parent().RemoveChild(paragraphNode.Parent(), paragraphNode)
 			}
 		}
 		return gast.WalkContinue, nil
