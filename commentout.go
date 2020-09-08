@@ -16,7 +16,7 @@ type commentoutDelimiterProcessor struct {
 }
 
 func (p *commentoutDelimiterProcessor) IsDelimiter(b byte) bool {
-	return b == '/' || b == ' '
+	return b == '/'
 }
 
 func (p *commentoutDelimiterProcessor) CanOpenCloser(opener, closer *parser.Delimiter) bool {
