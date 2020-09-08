@@ -81,8 +81,6 @@ func (r *CommentoutHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegi
 	reg.Register(ast.KindCommentout, r.renderCommentout)
 }
 
-var CommentoutAttributeFilter = html.GlobalAttributeFilter
-
 func (r *CommentoutHTMLRenderer) renderCommentout(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<!-- ")
